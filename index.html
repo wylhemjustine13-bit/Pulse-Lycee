@@ -52,13 +52,39 @@
   <div class="toast" id="toast" role="status"></div>
   <script>
     const form=document.querySelector('#postForm'),field=document.querySelector('#postText'),posts=document.querySelector('#posts'),count=document.querySelector('#count'),toast=document.querySelector('#toast');
-    function notify(message){toast.textContent=message;toast.style.display='block';setTimeout(()=>toast.style.display='none',2300)}
+    const composer=document.querySelector('.composer');let defaultFeed=posts.innerHTML;
+    function notify(message){toast.textContent=message;toast.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>toast.style.display='none',2300)}
+    function wireLikes(){document.querySelectorAll('[data-like]').forEach(button=>button.addEventListener('click',()=>button.textContent=button.textContent.startsWith('♡')?'♥ Aimé':'♡ J’aime'))}
+    function showSection(section){
+      document.querySelector('#sectionTitle').textContent=section;
+      composer.style.display=section==='Fil d’actualité'?'block':'none';
+      if(section==='Fil d’actualité'){posts.innerHTML=defaultFeed;wireLikes();return}
+      const content={
+        'Messages':['Tes conversations','La messagerie privée sera ajoutée après la mise en place des comptes et des règles de sécurité.','Aucune conversation pour le moment.'],
+        'Groupes':['Les groupes du lycée','Des espaces pourront être créés pour les clubs, les projets et les activités.','Aucun groupe disponible pour le moment.'],
+        'Notifications':['Tes notifications','Tu retrouveras ici les nouvelles publications, réponses et annonces importantes.','Tu es à jour !'],
+        'Mon profil':['Ton profil','Présente-toi avec un pseudonyme et quelques informations non sensibles.','La création du profil sera disponible après la mise en place de l’inscription sécurisée.']
+      }[section];
+      posts.innerHTML='<section class="panel"><h3>'+content[0]+'</h3><p>'+content[1]+'</p><div class="empty">'+content[2]+'</div><span class="tag">Fonctionnalité en préparation</span></section>';
+    }
     field.addEventListener('input',()=>count.textContent=field.value.length+' / 500');
-    form.addEventListener('submit',event=>{event.preventDefault();const value=field.value.trim();if(!value){notify('Écris un message avant de publier.');return}const article=document.createElement('article');article.className='panel post';const top=document.createElement('div');top.className='post-top';top.innerHTML='<div class="avatar">É</div><div><div class="who">Élève</div><div class="when">À l’instant · publication locale</div></div>';const paragraph=document.createElement('p');paragraph.textContent=value;const actions=document.createElement('div');actions.className='post-actions';const like=document.createElement('button');like.type='button';like.textContent='♡ J’aime';like.addEventListener('click',()=>{like.textContent=like.textContent.startsWith('♡')?'♥ Aimé':'♡ J’aime'});actions.append(like);article.append(top,paragraph,actions);posts.prepend(article);field.value='';count.textContent='0 / 500';notify('Publication ajoutée à cet aperçu.');});
-    document.querySelectorAll('[data-like]').forEach(button=>button.addEventListener('click',()=>button.textContent=button.textContent.startsWith('♡')?'♥ Aimé':'♡ J’aime'));
-    document.querySelectorAll('[data-demo]').forEach(button=>button.addEventListener('click',()=>notify(button.dataset.demo)));
-    document.querySelectorAll('[data-section]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-section]').forEach(item=>item.classList.remove('active'));button.classList.add('active');document.querySelector('#sectionTitle').textContent=button.dataset.section;if(button.dataset.section!=='Fil d’actualité')notify('La rubrique « '+button.dataset.section+' » sera développée ensuite.');}));
-    document.querySelector('#profileBtn').addEventListener('click',()=>notify('La création des profils arrive dans la prochaine étape.'));
+    form.addEventListener('submit',event=>{
+      event.preventDefault();const value=field.value.trim();
+      if(!value){notify('Écris un message avant de publier.');return}
+      const article=document.createElement('article');article.className='panel post';
+      const top=document.createElement('div');top.className='post-top';top.innerHTML='<div class="avatar">É</div><div><div class="who">Élève</div><div class="when">À l’instant · aperçu local</div></div>';
+      const paragraph=document.createElement('p');paragraph.textContent=value;
+      const actions=document.createElement('div');actions.className='post-actions';
+      const like=document.createElement('button');like.type='button';like.textContent='♡ J’aime';like.addEventListener('click',()=>like.textContent=like.textContent.startsWith('♡')?'♥ Aimé':'♡ J’aime');
+      actions.append(like);article.append(top,paragraph,actions);posts.prepend(article);
+      defaultFeed=posts.innerHTML;field.value='';count.textContent='0 / 500';notify('Publication ajoutée à cet aperçu.');
+    });
+    document.querySelectorAll('[data-section]').forEach(button=>button.addEventListener('click',()=>{
+      document.querySelectorAll('[data-section]').forEach(item=>item.classList.remove('active'));
+      button.classList.add('active');showSection(button.dataset.section);
+    }));
+    document.querySelector('#profileBtn').addEventListener('click',()=>document.querySelector('[data-section="Mon profil"]').click());
+    wireLikes();
   </script>
 </body>
 </html>
