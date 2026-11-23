@@ -49,73 +49,110 @@
     </div>
     <footer class="foot">Hiera Sociale · Prototype d’interface · Aucune donnée n’est envoyée à un serveur.</footer>
   </div>
-  <div class="auth-layer" id="authLayer" role="dialog" aria-modal="true" aria-labelledby="authTitle"><section class="auth-box"><h2 id="authTitle">Bienvenue sur Hiera Sociale</h2><p id="authSubtitle">Connecte-toi pour retrouver ton espace.</p><div class="auth-tabs"><button class="btn primary" id="loginTab" type="button">Connexion</button><button class="btn" id="registerTab" type="button">Inscription</button></div><form id="authForm"><label for="username">Pseudonyme</label><input id="username" name="username" maxlength="24" autocomplete="username" placeholder="Ex. EleveCurieux" required><label for="password">Mot de passe</label><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Mot de passe" required><div id="confirmWrap" hidden><label for="passwordConfirm">Confirmer le mot de passe</label><input id="passwordConfirm" type="password" autocomplete="new-password" placeholder="Retape ton mot de passe"></div><p class="auth-warning">Prototype uniquement : aucune création de compte ni connexion réelle. N’utilise pas ton vrai mot de passe.</p><div class="auth-actions"><button class="btn" id="authClose" type="button">Fermer</button><button class="btn primary" type="submit" id="authSubmit">Se connecter</button></div></form></section></div>
+  <div class="auth-layer" id="authLayer" role="dialog" aria-modal="true" aria-labelledby="authTitle"><section class="auth-box"><h2 id="authTitle">Bienvenue sur Hiera Sociale</h2><p id="authSubtitle">Connecte-toi pour retrouver ton espace.</p><div class="auth-tabs"><button class="btn primary" id="loginTab" type="button">Connexion</button><button class="btn" id="registerTab" type="button">Inscription</button></div><form id="authForm"><label for="username">Pseudonyme</label><input id="username" name="username" maxlength="24" autocomplete="nickname" placeholder="Ex. EleveCurieux" required><p class="auth-warning">Mode démonstration : ton pseudonyme reste sur cet appareil. Aucun mot de passe ni vrai compte n'est créé. N'utilise pas d'information personnelle.</p><div class="auth-actions"><button class="btn" id="authClose" type="button">Fermer</button><button class="btn primary" type="submit" id="authSubmit">Continuer</button></div></form></section></div>
   <div class="toast" id="toast" role="status"></div>
   <script>
-    const form=document.querySelector('#postForm'),field=document.querySelector('#postText'),posts=document.querySelector('#posts'),count=document.querySelector('#count'),toast=document.querySelector('#toast');
-    const composer=document.querySelector('.composer');let defaultFeed=posts.innerHTML;
-    function notify(message){toast.textContent=message;toast.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>toast.style.display='none',2300)}
-    function wireLikes(){document.querySelectorAll('[data-like]').forEach(button=>button.addEventListener('click',()=>button.textContent=button.textContent.startsWith('♡')?'♥ Aimé':'♡ J’aime'))}
-    document.addEventListener('click',event=>{const report=event.target.closest('[data-report]');if(report){notify('Merci. Le signalement est simulé dans cette maquette et ne part pas au lycée.');return}const demo=event.target.closest('[data-demo]');if(demo)notify(demo.dataset.demo)});
+    const form=document.querySelector('#postForm');
+    const field=document.querySelector('#postText');
+    const posts=document.querySelector('#posts');
+    const count=document.querySelector('#count');
+    const toast=document.querySelector('#toast');
+    const composer=document.querySelector('.composer');
+    const authLayer=document.querySelector('#authLayer');
+    const authForm=document.querySelector('#authForm');
+    const authButton=document.querySelector('#authOpen');
+    const STORAGE_KEY='hiera-demo-posts-v1';
+    let username=sessionStorage.getItem('hiera-demo-user')||'';
+    const welcome=posts.innerHTML;
+    let savedPosts=[];
+    function notify(message){
+      toast.textContent=message;toast.style.display='block';
+      clearTimeout(window.toastTimer);
+      window.toastTimer=setTimeout(()=>toast.style.display='none',2600);
+    }
+    function safeLoad(){
+      try{const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return Array.isArray(data)?data:[]}
+      catch{return []}
+    }
+    function savePosts(){
+      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(savedPosts));}
+      catch{notify('Stockage indisponible sur cet appareil.');}
+    }
+    function initials(name){return (name||'É').slice(0,1).toUpperCase()}
+    function makePost(item){
+      const article=document.createElement('article');article.className='panel post';
+      const top=document.createElement('div');top.className='post-top';
+      const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent=initials(item.author);
+      const details=document.createElement('div');
+      const who=document.createElement('div');who.className='who';who.textContent=item.author||'Visiteur';
+      const when=document.createElement('div');when.className='when';when.textContent=item.date||'Publication locale';
+      details.append(who,when);top.append(avatar,details);
+      const paragraph=document.createElement('p');paragraph.textContent=item.text;
+      const actions=document.createElement('div');actions.className='post-actions';
+      const like=document.createElement('button');like.type='button';like.textContent=item.liked?'♥ Aimé':'♡ J’aime';
+      like.addEventListener('click',()=>{item.liked=!item.liked;like.textContent=item.liked?'♥ Aimé':'♡ J’aime';savePosts()});
+      const report=document.createElement('button');report.type='button';report.textContent='⚑ Signaler';
+      report.addEventListener('click',()=>notify('Signalement de démonstration : aucun modérateur ne le reçoit.'));
+      actions.append(like,report);article.append(top,paragraph,actions);return article;
+    }
+    function renderFeed(){
+      posts.innerHTML=welcome;
+      savedPosts.forEach(item=>posts.append(makePost(item)));
+      posts.querySelectorAll('[data-like]').forEach(button=>button.addEventListener('click',()=>button.textContent=button.textContent.startsWith('♡')?'♥ Aimé':'♡ J’aime'));
+    }
+    function updateAccountButton(){authButton.textContent=username?'Déconnexion':'Profil démo'}
     function showSection(section){
       document.querySelector('#sectionTitle').textContent=section;
       composer.style.display=section==='Fil d’actualité'?'block':'none';
-      if(section==='Fil d’actualité'){posts.innerHTML=defaultFeed;wireLikes();return}
-      const content={
-        'Messages':['Tes conversations','La messagerie privée sera ajoutée après la mise en place des comptes et des règles de sécurité.','Aucune conversation pour le moment.'],
-        'Groupes':['Les groupes du lycée','Des espaces pourront être créés pour les clubs, les projets et les activités.','Aucun groupe disponible pour le moment.'],
-        'Notifications':['Tes notifications','Tu retrouveras ici les nouvelles publications, réponses et annonces importantes.','Tu es à jour !'],
-        'Mon profil':['Ton profil','Présente-toi avec un pseudonyme et quelques informations non sensibles.','La création du profil sera disponible après la mise en place de l’inscription sécurisée.']
-      }[section];
-      posts.innerHTML='<section class="panel"><h3>'+content[0]+'</h3><p>'+content[1]+'</p><div class="empty">'+content[2]+'</div><span class="tag">Fonctionnalité en préparation</span></section>';
+      if(section==='Fil d’actualité'){renderFeed();return}
+      const panel=document.createElement('section');panel.className='panel';
+      const heading=document.createElement('h3');heading.textContent=section;
+      const description=document.createElement('p');description.className='muted';
+      const empty=document.createElement('div');empty.className='empty';
+      if(section==='Mon profil'){
+        description.textContent='Ton espace de démonstration sur cet appareil.';
+        empty.textContent=username?'Connecté en mode démo sous le pseudonyme : '+username:'Aucun pseudonyme choisi pour le moment.';
+        const edit=document.createElement('button');edit.className='btn primary';edit.textContent=username?'Changer de pseudonyme':'Choisir un pseudonyme';
+        edit.addEventListener('click',openAuth);panel.append(heading,description,empty,edit);
+      }else if(section==='Groupes'){
+        description.textContent='Exemples de communautés à créer avec ton lycée.';
+        ['Club de lecture','Sport et activités','Projets et entraide'].forEach(name=>{const row=document.createElement('p');row.textContent='◎  '+name+' · bientôt disponible';panel.append(row)});
+        panel.prepend(heading,description);
+      }else if(section==='Notifications'){
+        description.textContent='Les notifications seront reliées aux comptes et aux activités lorsque le serveur sera prêt.';
+        empty.textContent='Aucune notification pour le moment.';panel.append(heading,description,empty);
+      }else{
+        description.textContent='La messagerie privée sera ajoutée après la mise en place des comptes sécurisés et des outils de modération.';
+        empty.textContent='Aucune conversation. La messagerie n’est pas encore activée.';panel.append(heading,description,empty);
+      }
+      posts.replaceChildren(panel);
     }
+    function openAuth(){document.querySelector('#authTitle').textContent='Ton profil de démonstration';document.querySelector('#authSubtitle').textContent='Choisis un pseudonyme pour utiliser la maquette.';document.querySelector('#authSubmit').textContent='Continuer';document.querySelector('#username').value=username;authLayer.classList.add('open')}
     field.addEventListener('input',()=>count.textContent=field.value.length+' / 500');
     form.addEventListener('submit',event=>{
       event.preventDefault();const value=field.value.trim();
       if(!value){notify('Écris un message avant de publier.');return}
-      const article=document.createElement('article');article.className='panel post';
-      const top=document.createElement('div');top.className='post-top';top.innerHTML='<div class="avatar">É</div><div><div class="who">Élève</div><div class="when">À l’instant · aperçu local</div></div>';
-      const paragraph=document.createElement('p');paragraph.textContent=value;
-      const actions=document.createElement('div');actions.className='post-actions';
-      const like=document.createElement('button');like.type='button';like.textContent='♡ J’aime';like.addEventListener('click',()=>like.textContent=like.textContent.startsWith('♡')?'♥ Aimé':'♡ J’aime');
-      const report=document.createElement('button');report.type='button';report.textContent='⚑ Signaler';report.dataset.report='';actions.append(like,report);article.append(top,paragraph,actions);posts.prepend(article);
-      defaultFeed=posts.innerHTML;field.value='';count.textContent='0 / 500';notify('Publication ajoutée à cet aperçu.');
+      const item={id:Date.now(),author:username||'Visiteur',text:value,date:'À l’instant · enregistré sur cet appareil',liked:false};
+      savedPosts.unshift(item);savePosts();renderFeed();field.value='';count.textContent='0 / 500';notify('Publication enregistrée sur cet appareil.');
     });
     document.querySelectorAll('[data-section]').forEach(button=>button.addEventListener('click',()=>{
       document.querySelectorAll('[data-section]').forEach(item=>item.classList.remove('active'));
       button.classList.add('active');showSection(button.dataset.section);
     }));
     document.querySelector('#profileBtn').addEventListener('click',()=>document.querySelector('[data-section="Mon profil"]').click());
-    wireLikes();
-    const authLayer=document.querySelector('#authLayer'),authForm=document.querySelector('#authForm');
-    let authMode='login';
-    function setAuthMode(mode){
-      authMode=mode;const registering=mode==='register';
-      document.querySelector('#authTitle').textContent=registering?'Créer un compte élève':'Bienvenue sur Hiera Sociale';
-      document.querySelector('#authSubtitle').textContent=registering?'Choisis un pseudonyme pour préparer ton profil.':'Connecte-toi pour retrouver ton espace.';
-      document.querySelector('#authSubmit').textContent=registering?'Créer mon compte':'Se connecter';
-      document.querySelector('#confirmWrap').hidden=!registering;
-      document.querySelector('#password').autocomplete=registering?'new-password':'current-password';
-      document.querySelector('#loginTab').classList.toggle('primary',!registering);
-      document.querySelector('#registerTab').classList.toggle('primary',registering);
-      document.querySelector('#passwordConfirm').required=registering;
-    }
-    document.querySelector('#authOpen').addEventListener('click',()=>{setAuthMode('login');authLayer.classList.add('open')});
+    authButton.addEventListener('click',()=>{
+      if(username){username='';sessionStorage.removeItem('hiera-demo-user');updateAccountButton();notify('Déconnecté de la maquette.');}
+      else openAuth();
+    });
     document.querySelector('#authClose').addEventListener('click',()=>authLayer.classList.remove('open'));
-    document.querySelector('#loginTab').addEventListener('click',()=>setAuthMode('login'));
-    document.querySelector('#registerTab').addEventListener('click',()=>setAuthMode('register'));
     authLayer.addEventListener('click',event=>{if(event.target===authLayer)authLayer.classList.remove('open')});
     authForm.addEventListener('submit',event=>{
-      event.preventDefault();
-      const username=document.querySelector('#username').value.trim();
-      const password=document.querySelector('#password').value;
-      const confirmation=document.querySelector('#passwordConfirm').value;
-      if(!/^[a-zA-Z0-9_-]{3,24}$/.test(username)){notify('Utilise 3 à 24 caractères : lettres, chiffres, _ ou -.');return}
-      if(password.length<8){notify('Pour cette maquette, le mot de passe doit avoir au moins 8 caractères.');return}
-      if(authMode==='register'&&password!==confirmation){notify('Les deux mots de passe ne correspondent pas.');return}
-      authForm.reset();authLayer.classList.remove('open');
-      notify(authMode==='register'?'Inscription de démonstration : aucun compte créé.':'Connexion de démonstration : aucun compte vérifié.');
+      event.preventDefault();const value=document.querySelector('#username').value.trim();
+      if(!/^[a-zA-Z0-9_-]{3,24}$/.test(value)){notify('Choisis 3 à 24 caractères : lettres, chiffres, _ ou -.');return}
+      username=value;sessionStorage.setItem('hiera-demo-user',username);updateAccountButton();authLayer.classList.remove('open');notify('Pseudonyme activé sur cet appareil.');
+      if(document.querySelector('#sectionTitle').textContent==='Mon profil')showSection('Mon profil');
     });
+    savedPosts=safeLoad();updateAccountButton();renderFeed();
   </script>
 </body>
 </html>
