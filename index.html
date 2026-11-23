@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <meta name="description" content="Hiera Sociale — le réseau de la vie au lycée.">
+  <title>Hiera Sociale</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b1020;--panel:#151d31;--panel2:#1c2740;--text:#f4f6fb;--muted:#aab5ca;--line:#2b3854;--accent:#8b9cff;--accent2:#b7c2ff;--good:#72d6b1}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0%,#202c50 0,transparent 35%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+    button,input,textarea{font:inherit}button{cursor:pointer}.shell{max-width:1180px;margin:auto;padding:20px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px}.logo{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#8294ff,#bd8cff);color:#10172a;font-weight:900;font-size:20px}.brand h1{font-size:20px;margin:0}.brand p{margin:0;color:var(--muted);font-size:12px}.top-actions{display:flex;gap:9px;align-items:center}.pill,.btn{border:1px solid var(--line);border-radius:12px;padding:9px 13px;background:var(--panel);color:var(--text)}.btn.primary{background:var(--accent);color:#11182a;border-color:transparent;font-weight:750}.layout{display:grid;grid-template-columns:220px minmax(0,1fr) 245px;gap:18px}.panel{background:rgba(21,29,49,.92);border:1px solid var(--line);border-radius:18px;padding:16px}.nav{display:grid;gap:7px}.nav button{width:100%;text-align:left;background:transparent;border:0;color:var(--muted);padding:11px 12px;border-radius:11px}.nav button.active,.nav button:hover{background:var(--panel2);color:var(--text)}.nav .hint{margin-top:12px;color:var(--muted);font-size:12px}.feed-head{display:flex;justify-content:space-between;align-items:center;margin:0 0 14px}.feed-head h2{margin:0;font-size:20px}.composer textarea{width:100%;resize:vertical;min-height:86px;background:#0e1628;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px;outline:none}.composer textarea:focus,input:focus{border-color:var(--accent)}.composer-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;color:var(--muted);font-size:12px}.post{margin-top:14px}.post-top{display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:#34446b;color:#e5eaff;font-weight:800}.who{font-weight:700}.when{font-size:12px;color:var(--muted)}.post p{margin:14px 0;white-space:pre-wrap;overflow-wrap:anywhere}.post-actions{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:10px}.post-actions button{background:transparent;color:var(--muted);border:0;padding:6px 9px;border-radius:8px}.post-actions button:hover{background:var(--panel2);color:var(--text)}.right h3{font-size:14px;margin:0 0 12px}.right p,.muted{color:var(--muted);font-size:13px}.rule{height:1px;background:var(--line);margin:15px 0}.tag{display:inline-block;border-radius:999px;padding:4px 8px;background:#253453;color:#cbd5ff;font-size:11px}.empty{text-align:center;padding:28px 12px;color:var(--muted)}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#e7ebff;color:#121a30;padding:10px 15px;border-radius:12px;display:none;box-shadow:0 8px 30px #0006}.foot{margin-top:22px;text-align:center;color:#77839b;font-size:11px}
+    @media(max-width:900px){.layout{grid-template-columns:190px minmax(0,1fr)}.right{display:none}}@media(max-width:620px){.shell{padding:13px}.layout{display:block}.left{display:none}.top{align-items:flex-start}.top-actions .pill{display:none}.panel{padding:13px}.feed{margin-top:12px}.brand h1{font-size:18px}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <div class="brand"><div class="logo">H</div><div><h1>Hiera Sociale</h1><p>Le réseau de la vie au lycée</p></div></div>
+      <div class="top-actions"><span class="pill">✦ Espace élève</span><button class="btn" id="profileBtn">Mon profil</button></div>
+    </header>
+    <div class="layout">
+      <aside class="panel left">
+        <nav class="nav" aria-label="Navigation principale">
+          <button class="active" data-section="Fil d’actualité">⌂　Fil d’actualité</button>
+          <button data-section="Messages">✉　Messages</button>
+          <button data-section="Groupes">◎　Groupes</button>
+          <button data-section="Notifications">♧　Notifications</button>
+          <button data-section="Mon profil">◉　Mon profil</button>
+        </nav>
+        <div class="rule"></div><span class="tag">Version prototype</span>
+        <p class="hint">Un espace pensé pour échanger autour de la vie scolaire, dans le respect de chacun.</p>
+      </aside>
+      <main class="feed">
+        <div class="feed-head"><h2 id="sectionTitle">Fil d’actualité</h2><span class="tag">Bienvenue</span></div>
+        <section class="panel composer">
+          <div class="post-top"><div class="avatar">É</div><div><div class="who">Espace de publication</div><div class="when">Partage une idée avec la communauté</div></div></div>
+          <form id="postForm"><textarea id="postText" maxlength="500" placeholder="Quoi de neuf au lycée ?" aria-label="Contenu de la publication"></textarea><div class="composer-foot"><span id="count">0 / 500</span><button class="btn primary" type="submit">Publier ↗</button></div></form>
+        </section>
+        <div id="posts" aria-live="polite">
+          <article class="panel post"><div class="post-top"><div class="avatar">H</div><div><div class="who">Hiera Sociale <span class="tag">Annonce</span></div><div class="when">Message de bienvenue</div></div></div><p>Bienvenue sur Hiera Sociale ! Cet espace a vocation à rassembler la communauté du lycée, partager les actualités et faire vivre les projets dans un cadre bienveillant.</p><div class="post-actions"><button type="button" data-like>♡ J’aime</button><button type="button" data-demo="Les commentaires seront disponibles dans une prochaine version.">▢ Commenter</button></div></article>
+        </div>
+      </main>
+      <aside class="panel right">
+        <h3>À découvrir</h3><p>Les projets, clubs et événements de ton établissement pourront être mis en avant ici.</p><div class="rule"></div>
+        <h3>Nos principes</h3><p>Respect · Bienveillance · Confidentialité · Inclusion</p><div class="rule"></div>
+        <h3>Un espace plus sûr</h3><p>Les signalements et outils de modération feront partie des prochaines étapes.</p>
+      </aside>
+    </div>
+    <footer class="foot">Hiera Sociale · Prototype d’interface · Aucune donnée n’est envoyée à un serveur.</footer>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script>
+    const form=document.querySelector('#postForm'),field=document.querySelector('#postText'),posts=document.querySelector('#posts'),count=document.querySelector('#count'),toast=document.querySelector('#toast');
+    function notify(message){toast.textContent=message;toast.style.display='block';setTimeout(()=>toast.style.display='none',2300)}
+    field.addEventListener('input',()=>count.textContent=field.value.length+' / 500');
+    form.addEventListener('submit',event=>{event.preventDefault();const value=field.value.trim();if(!value){notify('Écris un message avant de publier.');return}const article=document.createElement('article');article.className='panel post';const top=document.createElement('div');top.className='post-top';top.innerHTML='<div class="avatar">É</div><div><div class="who">Élève</div><div class="when">À l’instant · publication locale</div></div>';const paragraph=document.createElement('p');paragraph.textContent=value;const actions=document.createElement('div');actions.className='post-actions';const like=document.createElement('button');like.type='button';like.textContent='♡ J’aime';like.addEventListener('click',()=>{like.textContent=like.textContent.startsWith('♡')?'♥ Aimé':'♡ J’aime'});actions.append(like);article.append(top,paragraph,actions);posts.prepend(article);field.value='';count.textContent='0 / 500';notify('Publication ajoutée à cet aperçu.');});
+    document.querySelectorAll('[data-like]').forEach(button=>button.addEventListener('click',()=>button.textContent=button.textContent.startsWith('♡')?'♥ Aimé':'♡ J’aime'));
+    document.querySelectorAll('[data-demo]').forEach(button=>button.addEventListener('click',()=>notify(button.dataset.demo)));
+    document.querySelectorAll('[data-section]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-section]').forEach(item=>item.classList.remove('active'));button.classList.add('active');document.querySelector('#sectionTitle').textContent=button.dataset.section;if(button.dataset.section!=='Fil d’actualité')notify('La rubrique « '+button.dataset.section+' » sera développée ensuite.');}));
+    document.querySelector('#profileBtn').addEventListener('click',()=>notify('La création des profils arrive dans la prochaine étape.'));
+  </script>
+</body>
+</html>
