@@ -9,9 +9,13 @@ Hiera Sociale est un projet de réseau social destiné à la communauté d'un ly
 - Navigation visuelle entre les rubriques prévues.
 - Première identité graphique Hiera Sociale.
 
-## Lancer le prototype
+## Accéder au prototype en ligne
 
-Ouvrir `index.html` dans un navigateur, ou activer GitHub Pages dans les paramètres du dépôt pour publier cette page statique.
+Après activation de GitHub Pages et réussite du workflow `Deploy Hiera Sociale demo to GitHub Pages`, le site sera disponible à l'adresse :
+
+https://wylhemjustine13-bit.github.io/Pulse-Lycee/
+
+Le workflow de publication se trouve dans `.github/workflows/pages.yml` et se lance à chaque push sur `main`.
 
 ## Important : limites de cette version
 
