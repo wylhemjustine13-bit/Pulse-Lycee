@@ -38,7 +38,7 @@
           <form id="postForm"><textarea id="postText" maxlength="500" placeholder="Quoi de neuf au lycée ?" aria-label="Contenu de la publication"></textarea><div class="composer-foot"><span id="count">0 / 500</span><button class="btn primary" type="submit">Publier ↗</button></div></form>
         </section>
         <div id="posts" aria-live="polite">
-          <article class="panel post"><div class="post-top"><div class="avatar">H</div><div><div class="who">Hiera Sociale <span class="tag">Annonce</span></div><div class="when">Message de bienvenue</div></div></div><p>Bienvenue sur Hiera Sociale ! Cet espace a vocation à rassembler la communauté du lycée, partager les actualités et faire vivre les projets dans un cadre bienveillant.</p><div class="post-actions"><button type="button" data-like>♡ J’aime</button><button type="button" data-demo="Les commentaires seront disponibles dans une prochaine version.">▢ Commenter</button></div></article>
+          <article class="panel post"><div class="post-top"><div class="avatar">H</div><div><div class="who">Hiera Sociale <span class="tag">Annonce</span></div><div class="when">Message de bienvenue</div></div></div><p>Bienvenue sur Hiera Sociale ! Cet espace a vocation à rassembler la communauté du lycée, partager les actualités et faire vivre les projets dans un cadre bienveillant.</p><div class="post-actions"><button type="button" data-like>♡ J’aime</button><button type="button" data-demo="Les commentaires seront disponibles dans une prochaine version.">▢ Commenter</button><button type="button" data-report>⚑ Signaler</button></div></article>
         </div>
       </main>
       <aside class="panel right">
@@ -55,6 +55,7 @@
     const composer=document.querySelector('.composer');let defaultFeed=posts.innerHTML;
     function notify(message){toast.textContent=message;toast.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>toast.style.display='none',2300)}
     function wireLikes(){document.querySelectorAll('[data-like]').forEach(button=>button.addEventListener('click',()=>button.textContent=button.textContent.startsWith('♡')?'♥ Aimé':'♡ J’aime'))}
+    document.addEventListener('click',event=>{const report=event.target.closest('[data-report]');if(report){notify('Merci. Le signalement est simulé dans cette maquette et ne part pas au lycée.');return}const demo=event.target.closest('[data-demo]');if(demo)notify(demo.dataset.demo)});
     function showSection(section){
       document.querySelector('#sectionTitle').textContent=section;
       composer.style.display=section==='Fil d’actualité'?'block':'none';
@@ -76,7 +77,7 @@
       const paragraph=document.createElement('p');paragraph.textContent=value;
       const actions=document.createElement('div');actions.className='post-actions';
       const like=document.createElement('button');like.type='button';like.textContent='♡ J’aime';like.addEventListener('click',()=>like.textContent=like.textContent.startsWith('♡')?'♥ Aimé':'♡ J’aime');
-      actions.append(like);article.append(top,paragraph,actions);posts.prepend(article);
+      const report=document.createElement('button');report.type='button';report.textContent='⚑ Signaler';report.dataset.report='';actions.append(like,report);article.append(top,paragraph,actions);posts.prepend(article);
       defaultFeed=posts.innerHTML;field.value='';count.textContent='0 / 500';notify('Publication ajoutée à cet aperçu.');
     });
     document.querySelectorAll('[data-section]').forEach(button=>button.addEventListener('click',()=>{
